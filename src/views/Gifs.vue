@@ -46,6 +46,9 @@
 
           <!-- Trending Section -->
 
+      
+
+
  <div class="container-fluid ">
   <div class="trendingtext" v-if="trendingGifs  && contextSwitch === 'trending'">
       <kbd>
@@ -54,10 +57,24 @@
       </div>
 
         
+       
+      <div style="display:flex;flex-direction:row;min-width:100%">
+        <div style="display:flex;flex-direction:column;max-width:25%">
+           <div v-for="gif in trendingGifs" :key="gif">
+          <a :href="gif.url+'/fullscreen'"  target="_blank" >
+            <img  class="lazyload" :src="gif.images.original.url"
+             :height="gif.images.original.height" :width="gif.images.original.width">
+          </a>
+      </div>
+        </div>
+
+
+      </div>
+
    
     <div v-if="trendingGifs  && contextSwitch === 'trending'">
        
-
+        
       <div class="container-fluid ">
         <div class="card-columns">
       <div class="card" v-for="gif in trendingGifs" :key="gif">
@@ -66,15 +83,6 @@
             <img  class="lazyload" :src="gif.images.original.url"
              :height="gif.images.original.height" :width="gif.images.original.width">
           </a>
-          <!-- <a 
-            class="gif-user" 
-            v-if="gif.user" 
-            :href="gif.user.profile_url"
-            target="_blank">
-              <img :src="gif.user.avatar_url" height="40" width="40">
-              {{ gif.user.display_name }}
-          </a> -->
-        <!-- </div> -->
       </div>
     </div>
 
@@ -127,7 +135,9 @@ export default {
         totalCountTrending : 0 ,
         CheckIfNoResultSearch : false,
         CheckIfFetchingTrending : true,
-        contextSwitch : ''
+        contextSwitch : '',
+        justChecking:[  ],
+        temptoPush:[]
    };
   },
   methods:{
@@ -155,6 +165,11 @@ export default {
                 
                 window.localStorage.setItem('trendingGifslocal', JSON.stringify(this.trendingGifs));
 
+               
+                this.temptoPush = data.data;
+                this.justChecking.push(Object.assign({}, this.temptoPush))
+                console.log('checking',this.justChecking);
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -167,7 +182,7 @@ export default {
 
            this.queried = true;
           this.searchfalse = true;
-          const url = `${this.apiUrl}/trending?api_key=${this.apiKey}&limit=16`;
+        const url = `${this.apiUrl}/trending?api_key=${this.apiKey}&limit=16`;
           // console.log(url);           
          this.isLoading = false;
          this.contextSwitch = "trending";
@@ -185,14 +200,15 @@ export default {
                 //   //  console.log('done in trending!');
                 //     // cache.addAll(this.trendingGifs);
                 //   })
-
+                this.temptoPush = data.data;
+                this.justChecking.push(Object.assign({}, this.temptoPush))
+                console.log('checking',this.justChecking);
                 window.localStorage.setItem('trendingGifslocal', JSON.stringify(this.trendingGifs));
 
               }).catch((error)=>{
               console.log(error);
             });
         
-
       },
 
 
@@ -300,7 +316,6 @@ export default {
 
 @media (min-width: 701px){
   .card-columns{
-    
   column-count: 4;
   }
 } 
@@ -310,11 +325,28 @@ export default {
   .card-columns{
     margin: 0.5rem;
   column-count: 1;
+  
   }
 }
+.firtest{
+  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0 4px;
+}
 
+.first_0{
+   flex: 25%;
+  max-width: 25%;
+  padding: 0 4px;
+}
 
-
+.first_0 a img {
+  margin-top: 8px;
+  vertical-align: middle;
+  width: 100%;
+}
 
 .nores{
   margin-bottom: 100px;

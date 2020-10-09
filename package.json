@@ -12,6 +12,7 @@
     "debounce": "^1.2.0",
     "lodash.debounce": "^4.0.8",
     "mdbvue": "^6.7.1",
+    "ngrok": "^3.3.0",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0-0",
     "vue-masonry": "^0.11.8",
