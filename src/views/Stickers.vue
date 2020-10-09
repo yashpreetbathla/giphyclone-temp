@@ -141,6 +141,12 @@ export default {
               this.isLoading=true;
               this.TrendingOffset += 8;
                this.CheckIfFetchingTrending = false;
+
+
+                window.localStorage.removeItem('trendingStickerslocal');
+                
+                window.localStorage.setItem('trendingStickerslocal', JSON.stringify(this.trendingStickers));
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -166,6 +172,9 @@ export default {
               // console.log(data.data); 
               //  this.HaveYouSearchedYet = false;
               this.TrendingOffset += 16;
+              
+                window.localStorage.setItem('trendingStickerslocal', JSON.stringify(this.trendingStickers));
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -192,6 +201,12 @@ export default {
               this.isLoading=true;
               this.SearchOffset += 8;
                this.HaveYouSearchedYet = false;
+
+
+                window.localStorage.removeItem('searchStickerslocal');
+                
+                window.localStorage.setItem('searchStickerslocal', JSON.stringify(this.searchedStickers));
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -225,6 +240,8 @@ export default {
               this.isLoading=true;
                this.HaveYouSearchedYet = false;
               this.SearchOffset += 16;
+
+                window.localStorage.setItem('searchStickerslocal', JSON.stringify(this.searchedStickers));
               if(this.searchedStickers.length === 0){
                 this.CheckIfNoResultSearch = true;
               }

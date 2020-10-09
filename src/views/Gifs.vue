@@ -63,7 +63,7 @@
       <div class="card" v-for="gif in trendingGifs" :key="gif">
         <!-- <div class="card" > -->
           <a :href="gif.url+'/fullscreen'"  target="_blank" >
-            <img   class="lazyload" :src="gif.images.original.url"
+            <img  class="lazyload" :src="gif.images.original.url"
              :height="gif.images.original.height" :width="gif.images.original.width">
           </a>
           <!-- <a 
@@ -109,8 +109,9 @@
 
 <script>
 
+// const staticName = 'staticCache';
 export default {
-  
+
   data(){
    return{
         apiUrl : 'https://api.giphy.com/v1/gifs',
@@ -123,7 +124,7 @@ export default {
         TrendingOffset : 0,
         HaveYouSearchedYet : false,
         totalCountSearch : 0 ,
-        totalCountTrending : 0,
+        totalCountTrending : 0 ,
         CheckIfNoResultSearch : false,
         CheckIfFetchingTrending : true,
         contextSwitch : ''
@@ -149,6 +150,11 @@ export default {
               this.isLoading=true;
               this.TrendingOffset += 8;
                this.CheckIfFetchingTrending = false;
+
+                window.localStorage.removeItem('trendingGifslocal');
+                
+                window.localStorage.setItem('trendingGifslocal', JSON.stringify(this.trendingGifs));
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -174,6 +180,14 @@ export default {
               // console.log(data.data); 
               //  this.HaveYouSearchedYet = false;
               this.TrendingOffset += 16;
+
+                //  caches.open(staticName).then((cache)=>{
+                //   //  console.log('done in trending!');
+                //     // cache.addAll(this.trendingGifs);
+                //   })
+
+                window.localStorage.setItem('trendingGifslocal', JSON.stringify(this.trendingGifs));
+
               }).catch((error)=>{
               console.log(error);
             });
@@ -200,6 +214,10 @@ export default {
               this.isLoading=true;
               this.SearchOffset += 8;
                this.HaveYouSearchedYet = false;
+                
+                window.localStorage.removeItem('trendingGifslocal');
+                window.localStorage.setItem('searchedGifslocal', JSON.stringify(this.searchedGifs));
+              
               }).catch((error)=>{
               console.log(error);
             });
@@ -233,6 +251,8 @@ export default {
               this.isLoading=true;
                this.HaveYouSearchedYet = false;
               this.SearchOffset += 16;
+                  if(this.searchedGifs)
+                      window.localStorage.setItem('searchedGifslocal', JSON.stringify(this.searchedGifs));
               if(this.searchedGifs.length === 0){
                 this.CheckIfNoResultSearch = true;
               }

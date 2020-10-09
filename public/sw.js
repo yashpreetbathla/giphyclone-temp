@@ -14,10 +14,6 @@
 // importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-
-importScripts(
-  "/precache-manifest.113ee726e4b9b4687707ff28c138c67f.js"
-);
 if (workbox) {
   console.log(`Boo! Workbox load 😬`);
   workbox.routing.registerRoute(
@@ -26,6 +22,24 @@ if (workbox) {
       cacheName: 'general-cache',
     })
   );
+
+  workbox.routing.registerRoute(
+    /^https:\/\/api.giphy.com\/(.*)/,
+    new workbox.strategies.NetworkFirst({
+      cacheName: 'api-cache',
+      plugins: [
+        new workbox.cacheableResponse.CacheableResponsePlugin({
+          statuses: [0, 200],
+        }),
+        new workbox.expiration.ExpirationPlugin({
+					maxEntries: 5,
+					maxAgeSeconds: 2 * 24 * 60 * 60, // 2 Days
+					purgeOnQuotaError: true
+				})
+      ]
+    })
+  );
+
   workbox.routing.registerRoute(
     /^https:\/\/media[0-9].giphy.com\/(.*)/,
     new workbox.strategies.CacheFirst({
