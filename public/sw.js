@@ -23,22 +23,22 @@ if (workbox) {
     })
   );
 
-  workbox.routing.registerRoute(
-    /^https:\/\/api.giphy.com\/(.*)/,
-    new workbox.strategies.NetworkFirst({
-      cacheName: 'api-cache',
-      plugins: [
-        new workbox.cacheableResponse.CacheableResponsePlugin({
-          statuses: [0, 200],
-        }),
-        new workbox.expiration.ExpirationPlugin({
-					maxEntries: 5,
-					maxAgeSeconds: 2 * 24 * 60 * 60, // 2 Days
-					purgeOnQuotaError: true
-				})
-      ]
-    })
-  );
+  // workbox.routing.registerRoute(
+  //   /^https:\/\/api.giphy.com\/(.*)/,
+  //   new workbox.strategies.NetworkFirst({
+  //     cacheName: 'api-cache',
+  //     plugins: [
+  //       new workbox.cacheableResponse.CacheableResponsePlugin({
+  //         statuses: [0, 200],
+  //       }),
+  //       new workbox.expiration.ExpirationPlugin({
+	// 				maxEntries: 5,
+	// 				maxAgeSeconds: 2 * 24 * 60 * 60, // 2 Days
+	// 				purgeOnQuotaError: true
+	// 			})
+  //     ]
+  //   })
+  // );
 
   workbox.routing.registerRoute(
     /^https:\/\/media[0-9].giphy.com\/(.*)/,

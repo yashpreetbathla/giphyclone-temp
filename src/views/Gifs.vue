@@ -61,13 +61,12 @@
 
       <div style="display: flex; flex-direction: row; min-width: 100%">
         <div
-          class="inner-container"
           v-for="gifGridView in gifGrid"
           :key="gifGridView"
         >
-          <div v-for="gif in gifGridView" :key="gif" style="width: 100%">
+          <div v-for="gif in gifGridView" :key="gif" style="width: 100%; padding: 3px;margin:1px;">
             <a :href="gif.url + '/fullscreen'" target="_blank">
-              <img
+              <img style="width: 100%; border: 2px solid grey; padding: 2px;margin:2px;"
                 :src="gif.images.original.url"
                 :height="gif.images.original.height"
                 :width="gif.images.original.width"
@@ -177,6 +176,7 @@ export default {
       let data = await this.fetchCacher(url);
 
       console.log(data);
+      // data = data[0];
       this.totalCountTrending = data.pagination.total_count;
       this.trendingGifs = data.data;
       let x = 0;
@@ -190,14 +190,8 @@ export default {
         x += this.trendingGifs.length / this.columns;
       }
       this.isLoading = true;
-      // console.log(data.data);
-      //  this.HaveYouSearchedYet = false;
       this.TrendingOffset += 16;
 
-      //  caches.open(staticName).then((cache)=>{
-      //   //  console.log('done in trending!');
-      //     // cache.addAll(this.trendingGifs);
-      //   })
       this.temptoPush = data.data;
       this.justChecking.push(Object.assign({}, this.temptoPush));
       console.log("checking", this.justChecking);
@@ -208,21 +202,20 @@ export default {
     },
     async fetchCacher(url) {
       let data = await this.fetchHandler(url);
-      data[1] && window.localStorage.setItem(url, JSON.stringify(data));
-      return data[0];
+      data && window.localStorage.setItem(url, JSON.stringify(data));
+      return data;
     },
     async fetchHandler(url) {
       if (window.localStorage.getItem(url))
-        return [JSON.parse(window.localStorage.getItem(url)), false];
+        return JSON.parse(window.localStorage.getItem(url));
       let res = await fetch(url);
       res = await res.json();
-      return [res, true];
+      return res;
     },
     onScrollDownSearch() {
       this.searchfalse = true;
       const url = `${this.apiUrl}/search?api_key=${this.apiKey}&q=${this.query}&limit=8&offset=${this.SearchOffset}`;
 
-      // console.log('Hi in scroll down' + url);
 
       this.isLoading = false;
       this.HaveYouSearchedYet = true;
@@ -230,8 +223,6 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           this.searchedGifs.push(...data.data);
-          // console.log(this.searchedGifs.length, this.searchedGifs);
-          // console.log(data.data);
           this.isLoading = true;
           this.SearchOffset += 8;
           this.HaveYouSearchedYet = false;
@@ -289,8 +280,6 @@ export default {
     },
     scroll() {
       window.onscroll = () => {
-        // console.log(window.innerHeight + window.scrollY ,  document.body.offsetHeight);
-        // console.log(this.contextSwitch);
         if (
           (window.innerHeight + window.scrollY) / document.body.offsetHeight >=
             0.93 &&
@@ -315,9 +304,7 @@ export default {
   },
   created() {
     const windowWidth = window.innerWidth;
-    if (windowWidth < 640) this.columns = 1;
-    else if (windowWidth < 900) this.columns = 2;
-    else if (windowWidth < 1200) this.columns = 3;
+    if (windowWidth < 640) this.columns = 2;
     else this.columns = 4;
 
     this.fetchTrendingGifs();
