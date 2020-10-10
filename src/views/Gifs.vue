@@ -8,7 +8,7 @@
         class="input"
         name="query1"
         v-model="query"
-        @keyup="searchGifs"
+        @keyup.enter="searchGifs"
       />
     </div>
     <!-- If no results found. -->
@@ -22,30 +22,24 @@
     <!-- Search -->
 
     <div class="container-fluid">
-      <div class="card-columns">
-        <div v-if="searchedGifs && contextSwitch === 'search'">
-          <div v-for="gif in searchedGifs" :key="gif">
-            <div class="card">
-              <a :href="gif.url + '/fullscreen'" target="_blank">
-                <img
-                  class="card-img-top"
-                  :src="gif.images.original.url"
-                  :height="gif.images.original.height"
-                  :width="gif.images.original.width"
-                />
-              </a>
-              <!-- <a 
-            class="gif-user" 
-            v-if="gif.user" 
-            :href="gif.user.profile_url"
-            target="_blank">
-              <img :src="gif.user.avatar_url" height="40" width="40">
-              {{ gif.user.display_name }}
-          </a> -->
-            </div>
+        <div style="display: flex; flex-direction: row; min-width: 100%" v-if="searchedGifs && contextSwitch === 'search'">
+           <div
+         style=" padding: 1px;margin:1px;"
+          v-for="(gifGridView1) in searchGrid"
+          :key="gifGridView1"
+        >
+          <div v-for="(gif) in gifGridView1" :key="gif" style="width: 100%; padding: 1px;margin:1px;">
+            <a :href="gif.url + '/fullscreen'" target="_blank">
+              <img :style="baseStyles"
+                :src="gif.images.original.url"
+                :height="gif.images.original.height"
+                :width="gif.images.original.width"
+              />
+            </a>
           </div>
         </div>
-      </div>
+        </div>
+     
     </div>
     <!-- Search End. -->
 
@@ -59,14 +53,15 @@
         <kbd> Trending </kbd>
       </div>
 
-      <div style="display: flex; flex-direction: row; min-width: 100%">
+      <div style="display: flex; flex-direction: row; min-width: 100%"  v-if="trendingGifs && contextSwitch === 'trending'" >
         <div
+         style=" padding: 1px;margin:1px;"
           v-for="gifGridView in gifGrid"
           :key="gifGridView"
         >
-          <div v-for="gif in gifGridView" :key="gif" style="width: 100%; padding: 3px;margin:1px;">
+          <div v-for="gif in gifGridView" :key="gif" style="width: 100%; padding: 1px;margin:1px;">
             <a :href="gif.url + '/fullscreen'" target="_blank">
-              <img style="width: 100%; border: 2px solid grey; padding: 2px;margin:2px;"
+              <img :style="baseStyles"
                 :src="gif.images.original.url"
                 :height="gif.images.original.height"
                 :width="gif.images.original.width"
@@ -103,6 +98,16 @@
 export default {
   data() {
     return {
+        baseStyles: {
+      width  : "100%",
+      // border : "2px solid grey" ,
+       padding : "2px" ,
+       margin : "2px"
+    },
+      overrideStyles: {
+      width:"100%",
+      border : "2px solid blue" ,
+    },
       apiUrl: "https://api.giphy.com/v1/gifs",
       apiKey: "gg3g9zjzjBHKW5bokVjFJ8Qc7GfTh546",
       searchedGifs: [],
@@ -121,10 +126,11 @@ export default {
       temptoPush: [],
       gifGrid: [],
       columns: 4,
+      searchGrid:[]
     };
   },
   methods: {
-    onScrollDownTrending() {
+    async onScrollDownTrending() {
       this.searchfalse = true;
       const url = `${this.apiUrl}/trending?api_key=${this.apiKey}&limit=8&offset=${this.TrendingOffset}`;
 
@@ -132,8 +138,8 @@ export default {
 
       this.isLoading = false;
       this.CheckIfFetchingTrending = true;
-      this.fetchHandler(url)
-        .then((data) => {
+      
+      let data = await this.fetchCacher(url);
           this.trendingGifs.push(...data.data);
           let updatedData = data.data;
           let x = 0;
@@ -143,27 +149,14 @@ export default {
             );
             x += updatedData.length / this.columns;
           }
-          console.log(this.gifGrid);
+          // console.log(this.gifGrid);
           // console.log(this.trendingGifs.length, this.trendingGifs);
           // console.log(data.data);
           this.isLoading = true;
           this.TrendingOffset += 8;
           this.CheckIfFetchingTrending = false;
 
-          window.localStorage.removeItem("trendingGifslocal");
-
-          window.localStorage.setItem(
-            "trendingGifslocal",
-            JSON.stringify(this.trendingGifs)
-          );
-
-          this.temptoPush = data.data;
-          this.justChecking.push(Object.assign({}, this.temptoPush));
-          console.log("checking", this.justChecking);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      
     },
 
     async fetchTrendingGifs() {
@@ -174,9 +167,6 @@ export default {
       this.isLoading = false;
       this.contextSwitch = "trending";
       let data = await this.fetchCacher(url);
-
-      console.log(data);
-      // data = data[0];
       this.totalCountTrending = data.pagination.total_count;
       this.trendingGifs = data.data;
       let x = 0;
@@ -191,59 +181,50 @@ export default {
       }
       this.isLoading = true;
       this.TrendingOffset += 16;
-
-      this.temptoPush = data.data;
-      this.justChecking.push(Object.assign({}, this.temptoPush));
-      console.log("checking", this.justChecking);
-      window.localStorage.setItem(
-        "trendingGifslocal",
-        JSON.stringify(this.trendingGifs)
-      );
     },
-    async fetchCacher(url) {
-      let data = await this.fetchHandler(url);
-      data && window.localStorage.setItem(url, JSON.stringify(data));
-      return data;
-    },
-    async fetchHandler(url) {
-      if (window.localStorage.getItem(url))
-        return JSON.parse(window.localStorage.getItem(url));
-      let res = await fetch(url);
-      res = await res.json();
-      return res;
-    },
-    onScrollDownSearch() {
+    async onScrollDownSearch() {
       this.searchfalse = true;
       const url = `${this.apiUrl}/search?api_key=${this.apiKey}&q=${this.query}&limit=8&offset=${this.SearchOffset}`;
 
 
       this.isLoading = false;
       this.HaveYouSearchedYet = true;
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          this.searchedGifs.push(...data.data);
+
           this.isLoading = true;
           this.SearchOffset += 8;
           this.HaveYouSearchedYet = false;
 
-          window.localStorage.removeItem("trendingGifslocal");
-          window.localStorage.setItem(
-            "searchedGifslocal",
-            JSON.stringify(this.searchedGifs)
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      let data = await this.fetchCacher(url);
+       
+         this.searchedGifs.push(...data.data);
+          let updatedData = data.data;
+          let x = 0;
+          for (let i = 0; i < this.columns; i++) {
+            this.searchGrid[i].push(
+              ...updatedData.slice(x, x + updatedData.length / this.columns)
+            );
+            x += updatedData.length / this.columns;
+          }
+          // console.log(this.trendingGifs.length, this.trendingGifs);
+          // console.log(data.data);
+          this.isLoading = true;
+          this.TrendingOffset += 8;
+          this.CheckIfFetchingTrending = false;
+       
     },
+     async searchGifs() {
+      // if (this.timeout) clearTimeout(this.timeout);
+      // this.timeout = await setTimeout(() => {
 
-    searchGifs: function () {
-      if (this.timeout) clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
+          // START COPY
+
+            
+            // END COPY
+
+
         // your action
 
-        this.queried = true;
+         this.queried = true;
         const url = `${this.apiUrl}/search?api_key=${this.apiKey}&q=${this.query}&limit=16`;
         // console.log(url);
         if (this.query.trim() === "") {
@@ -254,29 +235,36 @@ export default {
 
         this.isLoading = false;
 
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
+           let data = await this.fetchCacher(url);
+
+
+
             this.totalCountSearch = data.pagination.total_count;
             this.searchedGifs = data.data;
             this.isLoading = true;
             this.HaveYouSearchedYet = false;
             this.SearchOffset += 16;
-            if (this.searchedGifs)
-              window.localStorage.setItem(
-                "searchedGifslocal",
-                JSON.stringify(this.searchedGifs)
-              );
+            
+
+              let x = 0;
+              this.searchGrid = [];
+              for (let i = 0; i < this.columns; i++) {
+                this.searchGrid.push(
+                  this.searchedGifs.slice(
+                    x,
+                    x + this.searchedGifs.length / this.columns
+                  )
+                );
+                x += this.searchedGifs.length / this.columns;
+              }
+
             if (this.searchedGifs.length === 0) {
               this.CheckIfNoResultSearch = true;
             } else {
               this.CheckIfNoResultSearch = false;
             }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }, 600);
+         
+      // }, 600);
     },
     scroll() {
       window.onscroll = () => {
@@ -294,6 +282,21 @@ export default {
         }
       };
     },
+
+    async fetchCacher(url) {
+      let data = await this.fetchHandler(url);
+      data && window.localStorage.setItem(url, JSON.stringify(data));
+      return data;
+    },
+    async fetchHandler(url) {
+      console.log(url);
+      if (window.localStorage.getItem(url))
+        return JSON.parse(window.localStorage.getItem(url));
+      let res = await fetch(url);
+      res = await res.json();
+      return res;
+    },
+
   },
   watch: {
     searchedGifs() {
@@ -314,7 +317,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 @media (min-width: 701px) {
   .card-columns {
     column-count: 4;

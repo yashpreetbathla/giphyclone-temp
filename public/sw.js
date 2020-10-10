@@ -40,7 +40,7 @@ if (workbox) {
   //   })
   // );
 
-  workbox.routing.registerRoute(
+workbox.routing.registerRoute(
     /^https:\/\/media[0-9].giphy.com\/(.*)/,
     new workbox.strategies.CacheFirst({
       cacheName: 'image-cache',
