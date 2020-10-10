@@ -8,7 +8,7 @@
         class="input"
         name="query1"
         v-model="query"
-        @keyup.enter="searchGifs"
+        @keyup.enter="searchStickers"
       />
     </div>
     <!-- If no results found. -->
@@ -22,7 +22,7 @@
     <!-- Search -->
 
     <div class="container-fluid">
-        <div style="display: flex; flex-direction: row; min-width: 100%" v-if="searchedGifs && contextSwitch === 'search'">
+        <div style="display: flex; flex-direction: row; min-width: 100%" v-if="searchedStickers && contextSwitch === 'search'">
            <div
          style=" padding: 1px;margin:1px;"
           v-for="(gifGridView1) in searchGrid"
@@ -48,12 +48,12 @@
     <div class="container-fluid">
       <div
         class="trendingtext"
-        v-if="trendingGifs && contextSwitch === 'trending'"
+        v-if="trendingStickers && contextSwitch === 'trending'"
       >
         <kbd> Trending </kbd>
       </div>
 
-      <div style="display: flex; flex-direction: row; min-width: 100%"  v-if="trendingGifs && contextSwitch === 'trending'" >
+      <div style="display: flex; flex-direction: row; min-width: 100%"  v-if="trendingStickers && contextSwitch === 'trending'" >
         <div
          style=" padding: 1px;margin:1px;"
           v-for="gifGridView in gifGrid"
@@ -110,8 +110,8 @@ export default {
     },
       apiUrl: "https://api.giphy.com/v1/stickers",
       apiKey: "gg3g9zjzjBHKW5bokVjFJ8Qc7GfTh546",
-      searchedGifs: [],
-      trendingGifs: [],
+      searchedStickers: [],
+      trendingStickers: [],
       isLoading: false,
       query: "",
       SearchOffset: 0,
@@ -140,7 +140,7 @@ export default {
       this.CheckIfFetchingTrending = true;
       
       let data = await this.fetchCacher(url);
-          this.trendingGifs.push(...data.data);
+          this.trendingStickers.push(...data.data);
           let updatedData = data.data;
           let x = 0;
           for (let i = 0; i < this.columns; i++) {
@@ -150,7 +150,7 @@ export default {
             x += updatedData.length / this.columns;
           }
           // console.log(this.gifGrid);
-          // console.log(this.trendingGifs.length, this.trendingGifs);
+          // console.log(this.trendingStickers.length, this.trendingStickers);
           // console.log(data.data);
           this.isLoading = true;
           this.TrendingOffset += 8;
@@ -159,7 +159,7 @@ export default {
       
     },
 
-    async fetchTrendingGifs() {
+    async fetchTrendingStickers() {
       this.queried = true;
       this.searchfalse = true;
       const url = `${this.apiUrl}/trending?api_key=${this.apiKey}&limit=16`;
@@ -168,16 +168,16 @@ export default {
       this.contextSwitch = "trending";
       let data = await this.fetchCacher(url);
       this.totalCountTrending = data.pagination.total_count;
-      this.trendingGifs = data.data;
+      this.trendingStickers = data.data;
       let x = 0;
       for (let i = 0; i < this.columns; i++) {
         this.gifGrid.push(
-          this.trendingGifs.slice(
+          this.trendingStickers.slice(
             x,
-            x + this.trendingGifs.length / this.columns
+            x + this.trendingStickers.length / this.columns
           )
         );
-        x += this.trendingGifs.length / this.columns;
+        x += this.trendingStickers.length / this.columns;
       }
       this.isLoading = true;
       this.TrendingOffset += 16;
@@ -196,7 +196,7 @@ export default {
 
       let data = await this.fetchCacher(url);
        
-         this.searchedGifs.push(...data.data);
+         this.searchedStickers.push(...data.data);
           let updatedData = data.data;
           let x = 0;
           for (let i = 0; i < this.columns; i++) {
@@ -205,14 +205,14 @@ export default {
             );
             x += updatedData.length / this.columns;
           }
-          // console.log(this.trendingGifs.length, this.trendingGifs);
+          // console.log(this.trendingStickers.length, this.trendingStickers);
           // console.log(data.data);
           this.isLoading = true;
           this.TrendingOffset += 8;
           this.CheckIfFetchingTrending = false;
        
     },
-     async searchGifs() {
+     async searchStickers() {
       // if (this.timeout) clearTimeout(this.timeout);
       // this.timeout = await setTimeout(() => {
 
@@ -240,7 +240,7 @@ export default {
 
 
             this.totalCountSearch = data.pagination.total_count;
-            this.searchedGifs = data.data;
+            this.searchedStickers = data.data;
             this.isLoading = true;
             this.HaveYouSearchedYet = false;
             this.SearchOffset += 16;
@@ -250,15 +250,15 @@ export default {
               this.searchGrid = [];
               for (let i = 0; i < this.columns; i++) {
                 this.searchGrid.push(
-                  this.searchedGifs.slice(
+                  this.searchedStickers.slice(
                     x,
-                    x + this.searchedGifs.length / this.columns
+                    x + this.searchedStickers.length / this.columns
                   )
                 );
-                x += this.searchedGifs.length / this.columns;
+                x += this.searchedStickers.length / this.columns;
               }
 
-            if (this.searchedGifs.length === 0) {
+            if (this.searchedStickers.length === 0) {
               this.CheckIfNoResultSearch = true;
             } else {
               this.CheckIfNoResultSearch = false;
@@ -299,8 +299,8 @@ export default {
 
   },
   watch: {
-    searchedGifs() {
-      if (this.searchedGifs.length === 0) {
+    searchedStickers() {
+      if (this.searchedStickers.length === 0) {
         this.contextSwitch = "trending";
       }
     },
@@ -310,7 +310,7 @@ export default {
     if (windowWidth < 640) this.columns = 2;
     else this.columns = 4;
 
-    this.fetchTrendingGifs();
+    this.fetchTrendingStickers();
   },
   mounted() {
     this.scroll();
