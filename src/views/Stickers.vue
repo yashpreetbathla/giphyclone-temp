@@ -167,6 +167,7 @@ export default {
       this.isLoading = false;
       this.contextSwitch = "trending";
       let data = await this.fetchCacher(url);
+      
       this.totalCountTrending = data.pagination.total_count;
       this.trendingStickers = data.data;
       let x = 0;

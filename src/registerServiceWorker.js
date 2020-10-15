@@ -42,9 +42,6 @@ import { register } from 'register-service-worker'
       // caches.open(staticName).then((cache)=>{
       //   cache.addAll(assets);
       // })
-      self.addEventListener('fetch', function(event) {
-        console.log('fetch event',  event);
-      });
     },
     registered () {
       console.log('Service worker has been registered.')

@@ -53,13 +53,13 @@
         <kbd> Trending </kbd>
       </div>
 
-      <div style="display: flex; flex-direction: row; min-width: 100%"  v-if="trendingGifs && contextSwitch === 'trending'" >
+      <div style="display: flex; flex-direction: row-reverse; min-width: 100%"  v-if="trendingGifs && contextSwitch === 'trending'" >
         <div
          style=" padding: 1px;margin:1px;"
           v-for="gifGridView in gifGrid"
           :key="gifGridView"
         >
-          <div v-for="gif in gifGridView" :key="gif" style="width: 100%; padding: 1px;margin:1px;">
+          <div v-for="gif in gifGridView" :key="gif" style="max-width: 100%; padding: 1px;margin:1px;">
             <a :href="gif.url + '/fullscreen'" target="_blank">
               <img :style="baseStyles"
                 :src="gif.images.original.url"
@@ -140,7 +140,7 @@ export default {
       this.CheckIfFetchingTrending = true;
       
       let data = await this.fetchCacher(url);
-          this.trendingGifs.push(...data.data);
+          // this.trendingGifs.push(...data.data);
           let updatedData = data.data;
           let x = 0;
           for (let i = 0; i < this.columns; i++) {
